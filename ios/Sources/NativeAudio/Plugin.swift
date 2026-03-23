@@ -40,7 +40,12 @@ public class NativeAudio: CAPPlugin, CAPBridgedPlugin {
         self.fadeMusic = false
 
         do {
-            try self.session.setCategory(AVAudioSession.Category.playback)
+            // Default to mixing so other apps' audio is not ducked or interrupted until configure(focus: true).
+            try self.session.setCategory(
+                .playback,
+                mode: .default,
+                options: [.mixWithOthers]
+            )
             try self.session.setActive(false)
         } catch {
             print("Failed to set session category")
@@ -51,9 +56,9 @@ public class NativeAudio: CAPPlugin, CAPBridgedPlugin {
         self.fadeMusic = call.getBool(Constant.FadeKey, false)
         do {
             if call.getBool(Constant.FocusAudio, false) {
-                try self.session.setCategory(AVAudioSession.Category.playback)
+                try self.session.setCategory(.playback, mode: .default, options: [])
             } else {
-                try self.session.setCategory(AVAudioSession.Category.ambient)
+                try self.session.setCategory(.ambient, mode: .default, options: [])
             }
         } catch {
             print("Failed to set setCategory audio")
